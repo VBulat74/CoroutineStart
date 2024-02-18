@@ -1,6 +1,8 @@
 package ru.com.bulat.coroutinestart
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -38,19 +40,26 @@ class MainActivity : AppCompatActivity() {
     private fun loadCity(calBack : (String)-> Unit) {
         thread {
             Thread.sleep(5000)
-            calBack.invoke("Moscow")
+            Handler(Looper.getMainLooper()).post{
+                calBack.invoke("Moscow")
+            }
         }
     }
 
     private fun loadTemperature(city: String, calBack: (Int) -> Unit){
         thread {
-            Toast.makeText(
-                this,
-                getString(R.string.loading_temperature_toast, city),
-                Toast.LENGTH_SHORT
-            ).show()
+            runOnUiThread{
+                Toast.makeText(
+                    this,
+                    getString(R.string.loading_temperature_toast, city),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             Thread.sleep(5000)
-            calBack(17)
+            runOnUiThread{
+                calBack(17)
+            }
+
         }
     }
 }
