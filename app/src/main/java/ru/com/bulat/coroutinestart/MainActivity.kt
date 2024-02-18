@@ -3,6 +3,7 @@ package ru.com.bulat.coroutinestart
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -25,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        Log.d("AAA", "Load started $this")
         binding.progress.isVisible = true
         binding.buttonLoad.isEnabled = false
         loadCity{
@@ -33,6 +35,8 @@ class MainActivity : AppCompatActivity() {
                 binding.tvTemperature.text = it.toString()
                 binding.progress.isVisible = false
                 binding.buttonLoad.isEnabled = true
+
+                Log.d("AAA", "Load finished $this")
             }
         }
     }
