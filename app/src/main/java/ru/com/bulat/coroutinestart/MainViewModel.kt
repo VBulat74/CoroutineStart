@@ -2,6 +2,7 @@ package ru.com.bulat.coroutinestart
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,22 +13,31 @@ import kotlinx.coroutines.launch
 class MainViewModel : ViewModel() {
 
     private val parentJob = Job()
-    private val coroutineScope = CoroutineScope(Dispatchers.Main+ parentJob)
+    private val executionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.d(LOG_TAG, "Exception: ${throwable}")
+    }
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + parentJob + executionHandler)
 
-    fun method(){
+    fun method() {
         val childJob1 = coroutineScope.launch {
             delay(3000)
             Log.d(LOG_TAG, "first coroutine finished")
         }
         val childJob2 = coroutineScope.launch {
             delay(2000)
-            childJob1.cancel()
             Log.d(LOG_TAG, "second coroutine finished")
-            Log.d(LOG_TAG, "parent coroutine canceled: ${parentJob.isCancelled}")
         }
 
-        Log.d(LOG_TAG, parentJob.children.contains(childJob1).toString())
-        Log.d(LOG_TAG, parentJob.children.contains(childJob2).toString())
+        val childJob3 = coroutineScope.launch {
+            delay(1000)
+            error()
+            Log.d(LOG_TAG, "third coroutine finished")
+        }
+
+    }
+
+    private fun error() {
+        throw RuntimeException()
     }
 
     override fun onCleared() {
@@ -35,7 +45,7 @@ class MainViewModel : ViewModel() {
         coroutineScope.cancel()
     }
 
-    companion object{
+    companion object {
         private const val LOG_TAG = "AAA"
     }
 }
